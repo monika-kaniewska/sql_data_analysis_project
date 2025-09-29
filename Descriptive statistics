@@ -1,4 +1,4 @@
-### Descriptive statistics - film
+-- Descriptive statistics - film
 SELECT 
 --rental duration
 MIN (rental_duration) AS minimum_rental_duration,
