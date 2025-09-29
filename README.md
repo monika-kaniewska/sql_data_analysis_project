@@ -20,3 +20,6 @@ The analysis was conducted using Rockbuster's relational database, which include
 * Tableau Public – for creating interactive data visualizations
 * PowerPoint – for presenting insights and recommendations
 * Excel - to share query output with technical colleagues
+
+View the project presentation
+https://docs.google.com/presentation/d/1B_aRHwsHzNo1HTH_--BrKlYE5mFLiaNE/edit?slide=id.p2#slide=id.p2
