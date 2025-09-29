@@ -1,0 +1,94 @@
+-- Descriptive statistics
+SELECT 
+--rental duration
+MIN (rental_duration) AS minimum_rental_duration,
+MAX (rental_duration) AS maximum_rental_duration,
+AVG (rental_duration) AS average_rental_duration,
+--rental rate
+MIN (rental_rate) AS minimum_rental_rate,
+MAX (rental_rate) AS maximum_rental_rate,
+AVG (rental_rate) AS average_rental_rate,
+-- movie_length
+MIN (length) AS minimum_film_length,
+MAX (length) AS maximum_film_length,
+AVG (length) AS average_film_length,
+--most_common_rating
+MODE () WITHIN GROUP (ORDER BY rating) AS modal_value_rating
+FROM film;
+
+--Genres
+SELECT cat.name AS genre,  SUM (pay.amount) AS revenue 
+FROM category cat
+INNER JOIN film_category fc ON cat.category_id = fc.category_id
+INNER JOIN film fil ON fil.film_id = fc.film_id
+INNER JOIN inventory inv ON inv.film_id = fil.film_id
+INNER JOIN rental ren ON inv.inventory_id = ren.inventory_id
+INNER JOIN payment pay ON ren.rental_id = pay.rental_id
+GROUP BY cat.name
+ORDER BY revenue DESC;
+
+--Rating
+SELECT fil.rating, SUM (pay.amount) AS revenue
+FROM film fil
+INNER JOIN inventory inv ON inv.film_id = fil.film_id
+INNER JOIN rental ren ON inv.inventory_id = ren.inventory_id
+INNER JOIN payment pay ON pay.rental_id = ren.rental_id
+GROUP BY fil.rating
+ORDER BY revenue DESC;
+
+--Top Movies
+SELECT f.film_id, f.title, SUM (p.amount) AS total_amount_paid
+FROM film f
+INNER JOIN inventory i ON f.film_id = i.film_id
+INNER JOIN rental r ON i.inventory_id = r.inventory_id
+INNER JOIN payment p ON r.rental_id = p.rental_id
+GROUP BY f.film_id, p.amount
+ORDER BY total_amount_paid DESC, f.title ASC
+LIMIT 5;
+
+--Top Countries in relation to customer count
+SELECT cou.country, COUNT (cus.customer_id) AS customer_count
+FROM country cou
+INNER JOIN city cit ON cou.country_id = cit.country_id
+INNER JOIN address add ON add.city_id =cit.city_id
+INNER JOIN customer cus ON cus.address_id = add.address_id
+GROUP BY cou.country
+ORDER BY customer_count DESC
+LIMIT 10;
+
+--Top Cities within top countries
+SELECT cit.city, cou.country, COUNT (cus.customer_id) AS customer_count
+FROM city cit
+INNER JOIN country cou ON cou.country_id = cit.country_id
+INNER JOIN address add ON add.city_id =cit.city_id
+INNER JOIN customer cus ON cus.address_id = add.address_id
+WHERE cou.country IN
+                    (
+                      SELECT country
+                      FROM (
+                            SELECT cou.country, COUNT (cus.customer_id) AS customer_count
+                            FROM country cou
+                            INNER JOIN city cit ON cou.country_id = cit.country_id
+                            INNER JOIN address add ON add.city_id =cit.city_id
+                            INNER JOIN customer cus ON cus.address_id = add.address_id
+                            GROUP BY cou.country
+                            ORDER BY customer_count DESC
+                            LIMIT 10
+                            )
+                    )
+GROUP BY cit.city, cou.country
+ORDER BY customer_count DESC
+LIMIT 10;
+
+--Top Countries in relation to Revenue
+SELECT cou.country, SUM (pay.amount) AS total_payment
+FROM country cou
+INNER JOIN city cit ON cou.country_id = cit.country_id
+INNER JOIN address add ON add.city_id = cit.city_id
+INNER JOIN customer cus ON cus.address_id = add.address_id
+INNER JOIN payment pay ON pay.customer_id = cus.customer_id
+GROUP BY cou.country
+ORDER BY total_payment DESC
+
+
+
