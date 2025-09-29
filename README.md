@@ -7,7 +7,7 @@ This project analyzes customer and rental data for Rockbuster Stealth LLC, a fic
 The objective of this study is to support Rockbuster Stealth in creating a data-driven launch strategy by analyzing top genres, customer distribution, and sales by geography.
 
 ## Key Questions
-* Which movies contributed the most/least to revenue gain?
+* Which movies contributed the most to revenue gain?
 * What was the average rental duration for all videos?
 * Which countries are Rockbuster customers based in?
 * Where are customers with a high lifetime value based?
