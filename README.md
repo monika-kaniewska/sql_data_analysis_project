@@ -15,7 +15,7 @@ The objective of this study is to support Rockbuster Stealth in creating a data-
 The analysis was conducted using Rockbuster's relational database, which includes data on films, customers, payments, rentals, and more.
 
 # Tools
-* PostgreSQL + pgAdmin 4 – for querying and exploring the database
+* PostgreSQL + pgAdmin4 – for querying and exploring the database
 * DBVisualizer – to generate the Entity Relationship Diagram
 * Tableau Public – for creating interactive data visualizations
 * PowerPoint – for presenting insights and recommendations
