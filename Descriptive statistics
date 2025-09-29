@@ -1,0 +1,17 @@
+### Descriptive statistics - film
+SELECT 
+--rental duration
+MIN (rental_duration) AS minimum_rental_duration,
+MAX (rental_duration) AS maximum_rental_duration,
+AVG (rental_duration) AS average_rental_duration,
+--rental rate
+MIN (rental_rate) AS minimum_rental_rate,
+MAX (rental_rate) AS maximum_rental_rate,
+AVG (rental_rate) AS average_rental_rate,
+-- movie_length
+MIN (length) AS minimum_film_length,
+MAX (length) AS maximum_film_length,
+AVG (length) AS average_film_length,
+--most_common_rating
+MODE () WITHIN GROUP (ORDER BY rating) AS modal_value_rating
+FROM film;
