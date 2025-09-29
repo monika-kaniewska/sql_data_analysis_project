@@ -1,0 +1,97 @@
+-- Average amount paid by the top 5 customers
+
+WITH
+top_countries_cte (country) AS
+  (SELECT
+    cou.country,
+    COUNT (DISTINCT cus.customer_id) AS customer_count
+  FROM country cou
+  INNER JOIN city cit ON cou.country_id = cit.country_id
+  INNER JOIN address add ON add.city_id =cit.city_id
+  INNER JOIN customer cus ON cus.address_id = add.address_id
+  GROUP BY cou.country
+  ORDER BY customer_count DESC
+  LIMIT 10),
+top_cities_cte (city) AS
+  (SELECT 
+    cit.city, 
+    cou.country, 
+    COUNT (DISTINCT cus.customer_id) AS customer_count
+  FROM city cit
+  INNER JOIN country cou ON cou.country_id = cit.country_id
+  INNER JOIN address add ON add.city_id =cit.city_id
+  INNER JOIN customer cus ON cus.address_id = add.address_id
+  WHERE cou.country IN (SELECT country FROM top_countries_cte)
+  GROUP BY cit.city, cou.country
+  ORDER BY customer_count DESC
+  LIMIT 10),
+top_customers_cte (customer_id) AS
+  (SELECT
+    cus.customer_id,
+    cus.first_name,
+    cus.last_name,
+    cit.city,
+    cou.country, SUM(pay.amount) AS total_amount_paid
+  FROM payment pay
+  INNER JOIN customer cus ON cus.customer_id = pay.customer_id
+  INNER JOIN address add ON cus.address_id = add.address_id
+  INNER JOIN city cit ON add.city_id = cit.city_id
+  INNER JOIN country cou ON cit.country_id = cou.country_id
+  WHERE cit.city IN (SELECT city FROM top_cities_cte)
+  GROUP BY cus.customer_id, cit.city, cou.country
+  ORDER BY total_amount_paid DESC
+  LIMIT 5)
+SELECT AVG (total_amount_paid) AS average_total_amount_paid
+FROM top_customers_cte;
+
+--The number of customers and top customers identified per country.
+
+WITH
+top_countries_cte (country) AS
+  (SELECT
+  cou.country,
+  COUNT (DISTINCT cus.customer_id) AS customer_count
+  FROM country cou
+  INNER JOIN city cit ON cou.country_id = cit.country_id
+  INNER JOIN address add ON add.city_id =cit.city_id
+  INNER JOIN customer cus ON cus.address_id = add.address_id
+  GROUP BY cou.country
+  ORDER BY customer_count DESC
+  LIMIT 10),
+top_cities_cte (city) AS
+  (SELECT cit.city, cou.country, COUNT (DISTINCT cus.customer_id) AS customer_count
+  FROM city cit
+  INNER JOIN country cou ON cou.country_id = cit.country_id
+  INNER JOIN address add ON add.city_id =cit.city_id
+  INNER JOIN customer cus ON cus.address_id = add.address_id
+  WHERE cou.country IN (SELECT country FROM top_countries_cte)
+  GROUP BY cit.city, cou.country
+  ORDER BY customer_count DESC
+  LIMIT 10),
+top_customers_cte (customer_id) AS
+  (SELECT
+  cus.customer_id,
+  cus.first_name,
+  cus.last_name,
+  cit.city,
+  cou.country, SUM(pay.amount) AS total_amount_paid
+  FROM payment pay
+  INNER JOIN customer cus ON cus.customer_id = pay.customer_id
+  INNER JOIN address add ON cus.address_id = add.address_id
+  INNER JOIN city cit ON add.city_id = cit.city_id
+  INNER JOIN country cou ON cit.country_id = cou.country_id
+  WHERE cit.city IN (SELECT city FROM top_cities_cte)
+  GROUP BY cus.customer_id, cit.city, cou.country
+  ORDER BY total_amount_paid DESC
+  LIMIT 5)
+SELECT
+  cou.country,
+  COUNT (DISTINCT cus.customer_id) AS customer_count,
+  COUNT (DISTINCT tp.customer_id) AS top_5_customers
+FROM country cou
+INNER JOIN city cit ON cit.country_id = cou.country_id
+INNER JOIN address add ON add.city_id = cit.city_id
+INNER JOIN customer cus ON add.address_id = cus.address_id
+LEFT JOIN top_customers_cte tp ON tp.customer_id = cus.customer_id
+GROUP BY cou.country
+ORDER BY top_5_customers DESC
